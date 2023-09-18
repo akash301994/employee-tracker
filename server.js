@@ -6,6 +6,23 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
+
+//cfonts 
+const text = 'Employee Database';
+
+const options = {
+  font: 'block', 
+  align: 'left',  
+  colors: ['cyan', 'yellow'],  
+  background: 'black',  
+  letterSpacing: 1,  
+  lineHeight: 1,   
+  space: false,     
+  maxLength: '0',   
+};
+
+cfonts.say(text, options);
+
 //Database connection
 const connection = mysql2.createConnection({
     host: process.env.DB_HOST,
