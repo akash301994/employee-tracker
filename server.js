@@ -1,18 +1,19 @@
 const mysql2 = require('mysql2');
 const inquirer = require('inquirer');
-const express = require('express');
 const cfonts = require('cfonts');
+const dotenv = require('dotenv');
 
 
+dotenv.config();
 
-
+//Database connection
 const connection = mysql2.createConnection({
-    host: 'localhost',
-    port: 3306,
-    user: 'root',
-    password: '',
-    database: "employeeTracker_db",
-    });
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
+});
 
 
 connection.connect((err) =>{
@@ -89,4 +90,24 @@ function start() {
       });
   }
   
-  
+  //view depapartments
+  function viewAllDepartments() {
+    const query = "SELECT * FROM departments";
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        
+        start();
+    });
+}
+
+//view all roles
+function viewAllRoles() {
+    const query = "SELECT roles.title, roles.id, departments.department_name, roles.salary from roles join departments on roles.department_id = departments.id";
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        
+        start();
+    });
+}

@@ -1,3 +1,5 @@
+USE employeeTracker_db;
+
 INSERT TO departments (department_name)
 VALUES
 ('Asset Management'),
