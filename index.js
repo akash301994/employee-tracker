@@ -316,7 +316,7 @@ function addManager() {
 
       connection.query(
         query,
-        [answer.first_name, answer.last_name, null, null], // Assuming managers don't have roles or managers
+        [answer.first_name, answer.last_name, null, null],
         (err) => {
           if (err) throw err;
           console.log('Manager added successfully.');
@@ -324,4 +324,295 @@ function addManager() {
         }
       );
     });
+}
+
+// Function to update an employee's role
+function updateEmployeeRole() {
+  // First, we need to retrieve the list of employees and roles for the inquirer prompts.
+  const employeeQuery = `
+    SELECT id, CONCAT(first_name, ' ', last_name) AS employee_name FROM employee
+  `;
+
+  const roleQuery = `
+    SELECT id, title FROM roles
+  `;
+
+  connection.query(employeeQuery, (err, employees) => {
+    if (err) throw err;
+
+    connection.query(roleQuery, (err, roles) => {
+      if (err) throw err;
+
+      inquirer
+        .prompt([
+          {
+            type: 'list',
+            name: 'employee_id',
+            message: 'Select the employee to update:',
+            choices: employees.map((employee) => ({
+              name: employee.employee_name,
+              value: employee.id,
+            })),
+          },
+          {
+            type: 'list',
+            name: 'new_role_id',
+            message: 'Select the new role for the employee:',
+            choices: roles.map((role) => ({
+              name: role.title,
+              value: role.id,
+            })),
+          },
+        ])
+        .then((answer) => {
+          const query = `
+            UPDATE employee
+            SET role_id = ?
+            WHERE id = ?
+          `;
+
+          connection.query(
+            query,
+            [answer.new_role_id, answer.employee_id],
+            (err) => {
+              if (err) throw err;
+              console.log('Employee role updated successfully.');
+              start();
+            }
+          );
+        });
+    });
+  });
+}
+
+// Function to view employees by manager
+function viewEmployeesByManager() {
+  // First, we need to retrieve the list of managers for the inquirer prompt.
+  const managerQuery = `
+    SELECT id, CONCAT(first_name, ' ', last_name) AS manager_name
+    FROM employee
+    WHERE manager_id IS NULL
+  `;
+
+  connection.query(managerQuery, (err, managers) => {
+    if (err) throw err;
+
+    inquirer
+      .prompt([
+        {
+          type: 'list',
+          name: 'manager_id',
+          message: 'Select the manager to view employees:',
+          choices: managers.map((manager) => ({
+            name: manager.manager_name,
+            value: manager.id,
+          })),
+        },
+      ])
+      .then((answer) => {
+        const query = `
+          SELECT id, CONCAT(first_name, ' ', last_name) AS employee_name
+          FROM employee
+          WHERE manager_id = ?
+        `;
+
+        connection.query(query, [answer.manager_id], (err, employees) => {
+          if (err) throw err;
+          // Display employees managed by the selected manager
+          console.log(`Employees managed by ${managers.find((m) => m.id === answer.manager_id).manager_name}:`);
+          console.table(employees);
+          start();
+        });
+      });
+  });
+}
+
+// Function to view employees by department
+function viewEmployeesByDepartment() {
+  // First, we need to retrieve the list of departments for the inquirer prompt.
+  const departmentQuery = `
+    SELECT id, department_name FROM departments
+  `;
+
+  connection.query(departmentQuery, (err, departments) => {
+    if (err) throw err;
+
+    inquirer
+      .prompt([
+        {
+          type: 'list',
+          name: 'department_id',
+          message: 'Select the department to view employees:',
+          choices: departments.map((department) => ({
+            name: department.department_name,
+            value: department.id,
+          })),
+        },
+      ])
+      .then((answer) => {
+        const query = `
+          SELECT e.id, CONCAT(e.first_name, ' ', e.last_name) AS employee_name, r.title AS role
+          FROM employee e
+          INNER JOIN roles r ON e.role_id = r.id
+          WHERE r.department_id = ?
+        `;
+
+        connection.query(query, [answer.department_id], (err, employees) => {
+          if (err) throw err;
+          // Display employees in the selected department
+          console.log(`Employees in the ${departments.find((d) => d.id === answer.department_id).department_name} department:`);
+          console.table(employees);
+          start();
+        });
+      });
+  });
+}
+
+function deleteDepartmentsRolesEmployees() {
+  inquirer
+    .prompt([
+      {
+        type: 'list',
+        name: 'action',
+        message: 'Select what you want to delete:',
+        choices: ['Delete a department', 'Delete a role', 'Delete an employee', 'Back'],
+      },
+    ])
+    .then((answer) => {
+      switch (answer.action) {
+        case 'Delete a department':
+          deleteDepartment();
+          break;
+        case 'Delete a role':
+          deleteRole();
+          break;
+        case 'Delete an employee':
+          deleteEmployee();
+          break;
+        case 'Back':
+          start();
+          break;
+      }
+    });
+}
+
+// Function to delete a department
+function deleteDepartment() {
+  inquirer
+    .prompt([
+      {
+        type: 'input',
+        name: 'department_id',
+        message: 'Enter the ID of the department to delete:',
+      },
+    ])
+    .then((answer) => {
+      const query = `
+        DELETE FROM departments
+        WHERE id = ?
+      `;
+
+      connection.query(query, [answer.department_id], (err, result) => {
+        if (err) throw err;
+        console.log('Department deleted successfully.');
+        start();
+      });
+    });
+  
+}
+
+// Function to delete a role
+function deleteRole() {
+  inquirer
+  .prompt([
+    {
+      type: 'input',
+      name: 'role_id',
+      message: 'Enter the ID of the role to delete:',
+    },
+  ])
+  .then((answer) => {
+    const query = `
+      DELETE FROM roles
+      WHERE id = ?
+    `;
+
+    connection.query(query, [answer.role_id], (err, result) => {
+      if (err) throw err;
+      console.log('Role deleted successfully.');
+      start();
+    });
+  });
+}
+
+// Function to delete an employee
+function deleteEmployee() {
+  inquirer
+    .prompt([
+      {
+        type: 'input',
+        name: 'employee_id',
+        message: 'Enter the ID of the employee to delete:',
+      },
+    ])
+    .then((answer) => {
+      const query = `
+        DELETE FROM employee
+        WHERE id = ?
+      `;
+
+      connection.query(query, [answer.employee_id], (err, result) => {
+        if (err) throw err;
+        console.log('Employee deleted successfully.');
+        start();
+      });
+    });
+}
+
+
+
+
+// Function to view the total utilized budget of a department
+function viewTotalUtilizedBudgetOfDepartment() {
+  
+  const departmentQuery = `
+    SELECT id, department_name FROM departments
+  `;
+
+  connection.query(departmentQuery, (err, departments) => {
+    if (err) throw err;
+
+    inquirer
+      .prompt([
+        {
+          type: 'list',
+          name: 'department_id',
+          message: 'Select the department to view the budget:',
+          choices: departments.map((department) => ({
+            name: department.department_name,
+            value: department.id,
+          })),
+        },
+      ])
+      .then((answer) => {
+        const query = `
+          SELECT SUM(r.salary) AS total_budget
+          FROM roles r
+          WHERE r.department_id = ?
+        `;
+
+        connection.query(query, [answer.department_id], (err, result) => {
+          if (err) throw err;
+          // Display the total budget of the selected department
+          console.log(`Total Utilized Budget for ${departments.find((d) => d.id === answer.department_id).department_name}: $${result[0].total_budget}`);
+          start();
+        });
+      });
+  });
+}
+
+function exitApplication() {
+  console.log('Exiting the application.');
+  connection.end(); 
+  process.exit(0); 
 }
