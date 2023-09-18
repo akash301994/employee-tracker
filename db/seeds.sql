@@ -1,6 +1,6 @@
 USE employeeTracker_db;
 
-INSERT TO departments (department_name)
+INSERT INTO departments (department_name)
 VALUES
 ('Asset Management'),
 ('Business Development'),
@@ -11,7 +11,7 @@ VALUES
 ('Production'),
 ('Risk Management'),
 ('Operations'),
-('Creative Services'),
+('Creative Services');
 
 INSERT INTO ROLES (title, salary, department_id)
 VALUES
@@ -28,14 +28,14 @@ VALUES
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES
-('Kate', 'Conover', 1, 1),
-('Lucas', 'Evans', 2, 2),
-('Rosalia', 'May', 3, 3),
-('Alessandro', 'Cordova', 4, 4),
-('Miley', 'Long', 5, 5),
-('Derrick', 'Abeert', 6, 6),
-('London', 'England', 7, 7),
-('Alfonzo', 'Dunagan', 8, 8),
-('Sara', 'Torres', 9, 9),
-('Ayan', 'Mosley', 10, 10),
+('Kate', 'Conover', 1, null),
+('Lucas', 'Evans', 2, 1),
+('Rosalia', 'May', 3, 2),
+('Alessandro', 'Cordova', 4, 3),
+('Miley', 'Long', 5, 4),
+('Derrick', 'Abeert', 6, 5),
+('London', 'England', 7, 6),
+('Alfonzo', 'Dunagan', 8, 7),
+('Sara', 'Torres', 9, 8),
+('Ayan', 'Mosley', 10, 9);
 
