@@ -18,3 +18,13 @@ This command-line application is designed to help companies manage their employe
 - Easy navigation through the application using a menu system.
 
 ![screenshot](./images/employee2.png)
+
+
+# Assitence From:
+* Thomas Calle youtube
+* Bobbi Tarkany tutor
+* w3 schools
+
+# Links
+* https://github.com/akash301994/employee-tracker 
+* https://drive.google.com/file/d/1QvF3XkhdAjioctyj8Fh84jrqnHO-xQVG/view
