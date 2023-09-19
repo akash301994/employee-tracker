@@ -20,7 +20,7 @@ This command-line application is designed to help companies manage their employe
 ![screenshot](./images/employee2.png)
 
 
-# Assitence From:
+# Assitance From:
 * Thomas Calle youtube
 * Bobbi Tarkany tutor
 * w3 schools
